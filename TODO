@@ -1,4 +1,18 @@
 Representer les contraintes par des intentions (pas de structure supplémentaire?)
 Numéroter les variables dans l'ordre ou elle sont données (6.2)
 
-Liste d'adjacences
+Liste d'adjacences des contraintes
+
+
+Le formalisme CSP
+Probl`eme de satisfaction de contraintes (CSP)
+Instance
+P = (X,D,C,R) avec :
+	X un ensemble de n variables, 
+les espaces blancs représentés par un domaine initial {1, .., 9}
+	D un ensemble de domaines finis de taille au plus d,
+{1, .., 9}?
+	C un ensemble de m contraintes,
+Binaires ou n-aires
+	R un ensemble de relations de compatibilit ́e.
+
