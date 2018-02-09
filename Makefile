@@ -1,8 +1,8 @@
-parser: parser.o main.cpp
-	gcc -g3 -o $@ $^
+parser: parser.o csp.cpp main.cpp
+	g++ -g3 -o $@ $^
 
-%.o: %.cpp %.h
-	gcc -g3 -c $<
+%.o: %.cpp %.hpp
+	g++ -g3 -c $<
 
 clean:
 	rm -f parser *.o

@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "parser.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -15,7 +15,7 @@ typedef struct
 } Case;
 
 
-void parse (char * nom_fichier)
+void Csp::parse (char * nom_fichier)
 {
   FILE * f;         /* le descripteur du fichier à lire */
   int c;            /* le caractère courant */
@@ -226,21 +226,39 @@ void parse (char * nom_fichier)
 /* fonctions à compléter pour remplir vos structures de données */
 
 
-void Variable (int num)
+void Csp::Variable (int num)
 /* fonction permettant la création d'une nouvelle variable ayant pour numéro num */
 {
   printf ("Variable %d\n",num);
+  
+  Var var;
+  var.valeur = num;
+  
+  this->variables.push_back (var);
+  printf ("Ajout Variable %d\n",num);
+  
 }
 
 
-void Contrainte_Difference (int var1, int var2)
+void Csp::Contrainte_Difference (int var1, int var2)
 /* fonction permettant la création d'une nouvelle contrainte binaire de différence entre les variables var1 et var2*/
 {
   printf ("Contrainte binaire de difference entre %d et %d\n",var1,var2);
+  
+  
+  
+  Contrainte contrainte;
+  contrainte.portee.push_back(var1);
+  contrainte.portee.push_back(var2);
+  contrainte.arite = 2;
+  contrainte.nat = DIFFERENCE;
+  contrainte.valeur = 0; // temp
+  
+  this->contraintes.push_back (contrainte);
 }
 
 
-void Contrainte_Somme (int portee [], int arite, int val)
+void Csp::Contrainte_Somme (int portee [], int arite, int val)
 /* fonction permettant la création d'une nouvelle contrainte n-aire de somme portant sur les variables contenant dans le tableau portee de taille arite et dont la valeur est val */
 {
   int i;
@@ -249,4 +267,14 @@ void Contrainte_Somme (int portee [], int arite, int val)
   for (int i = 0; i < arite; i++)
     printf (" %d",portee[i]);
   printf (" et de valeur %d\n",val);  
+  
+  Contrainte contrainte;
+  for (int i = 0; i < arite; i++)
+    contrainte.portee.push_back(portee[i]);
+  contrainte.arite = arite;
+  contrainte.nat = NAIRES;
+  contrainte.valeur = val;
+  
+  this->contraintes.push_back (contrainte);
+  
 }

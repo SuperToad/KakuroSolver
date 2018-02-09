@@ -1,17 +1,21 @@
-#include "parser.h"
+#include "csp.hpp"
+#include "parser.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 
 
 int main (int argc, char * argv[])
 {
-  if (argc != 2)
-  {
-    fprintf (stderr,"Utilisation: %s fichier\n",argv[0]);
-    exit (-1);
-  }
+	if (argc != 2)
+	{
+	fprintf (stderr,"Utilisation: %s fichier\n",argv[0]);
+	exit (-1);
+	}
 
-  parse (argv[1]);
-  
-  return 0;
+	Csp *csp = new Csp ();
+
+	csp->parse (argv[1]);
+	csp->show ();
+
+	return 0;
 }
