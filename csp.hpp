@@ -16,7 +16,7 @@ typedef struct
 
 typedef struct
 {
-	vector<int> portee; // 1 a 9?
+	vector<int> portee; // Cases a verifier
 	int arite; // Nombre de variables soumises `a la contrainte
 	nature nat; // 0 : binaire de difference 1 : n-aires
 	int valeur; 
@@ -25,6 +25,13 @@ typedef struct
 	 */
 	
 } Contrainte;
+
+typedef struct
+{
+	Var variable;
+	int valeur;
+	
+} Solution;
 
 class Csp {
 	private:
@@ -47,9 +54,12 @@ class Csp {
 		void Contrainte_Somme (int portee[], int arite, int val);
 		/* fonction permettant la création d'une nouvelle contrainte n-aire de somme portant sur les variables contenant dans le tableau portee de taille arite et dont la valeur est val */
 		
+		inline vector<Var> getVariables () {return variables;};
 		void show ();
 		
-		void backtrack ();
+		bool estConsistant (vector<Solution> solutions);
+		
+		vector<Solution> backtrack (vector<Solution> solutions, vector<Var> variablesEnCours);
 		void forward_checking ();
 };
 
