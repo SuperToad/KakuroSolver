@@ -57,9 +57,9 @@ class Csp {
 		inline vector<Var> getVariables () {return variables;};
 		void show ();
 		
-		bool estConsistant (vector<Solution> solutions);
+		bool estConsistant (int* solutions);
 		
-		vector<Solution> backtrack (vector<Solution> solutions, vector<Var> variablesEnCours);
+		int* backtrack ();
 		void forward_checking ();
 };
 

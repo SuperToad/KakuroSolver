@@ -10,46 +10,88 @@ Csp::~Csp()
 	
 }
 
-bool Csp::estConsistant (vector<Solution> solutions)
+bool Csp::estConsistant (int* solutions)
 {
 	for (int i = 0; i < this->contraintes.size (); i++)
 	{
-		for (int j = 0; j < this->contraintes.at (i).arite; j++)
-			for (int k = 0; k < this->contraintes.at (i).portee.at (j); k++)
+		bool estVerifiable = true;
+		
+		for (int j = 0; ((j < this->contraintes.at (i).arite) && (estVerifiable)); j++)
+		{
+			// On verifie si la contrainte peut etre satisfaite :
+			// toutes les variables associées a la contrainte sont instanciés
+			
+			if (solutions[this->contraintes.at (i).portee.at (j)] == -1)
+				estVerifiable = false;
+		}
+		if (estVerifiable)
+		{
+			cout << "Contrainte " << i << " verifiable" << endl;
+			
+			if (this->contraintes.at (i).nat == DIFFERENCE)
 			{
-				for (int l = 0; l < solutions.size (); l++)
+				if (solutions[this->contraintes.at (i).portee.at (0)] == solutions[this->contraintes.at (i).portee.at (1)])
 				{
-					if (solutions.at (l).variable.valeur ==  this->contraintes.at (i).portee.at (j))
-						cout << "True" << solutions.at (l).variable.valeur << " == " << this->contraintes.at (i).portee.at (j) << endl;
+					cout << "Contrainte binaire de difference rejetee; valeur = " << solutions[this->contraintes.at (i).portee.at (0)] << endl;
+					return false;
 				}
 			}
+			else
+			{
+				int somme = 0;
+				for (int j = 0; j < this->contraintes.at (i).arite; j++)
+				{
+					somme += solutions[this->contraintes.at (i).portee.at (j)];
+				}
+				cout << "Somme a atteindre = " << contraintes.at (i).valeur << "; resultat = " << somme << endl;
+				if (contraintes.at (i).valeur != somme)
+					return false;
+			}
+			
+		}
+		else
+			cout << "Contrainte " << i << " non verifiable" << endl;
 	}
 	return true;
 }
 
-vector<Solution> Csp::backtrack (vector<Solution> solutions, vector<Var> variablesEnCours)
+int* Csp::backtrack ()
 {
-	if (variablesEnCours.empty())
+	vector<Var> variablesEnCours = variables;
+	
+	int solutions [variables.size ()];
+	// init solutions
+	for (int i = 0; i < variables.size (); i++)
+		solutions[i] = -1;
+	
+	/*if (variablesEnCours.empty())
 	{
 		// A est une solution
 		return solutions;
 	}
 	else
+	{*/
+	while (!variablesEnCours.empty())
 	{
-		Var var = variablesEnCours.back (); // Choisir x dans V
+		Var* var = &variablesEnCours.back (); // Choisir x dans V
 		variablesEnCours.pop_back ();
 		
-		cout << "Var : " << var.valeur << endl;
+		cout << "\t\tVar : " << var->valeur << endl;
 		
-		for (int d = 1; d <= 9; d++)
+		bool consistance = false;
+		
+		for (int d = 1; ((d <= 9) && (!consistance)); d++)
 		{
-			cout << "Domaine : " << d << endl;
-			Solution sol;
-			sol.variable = var;
-			sol.valeur = d;
-			solutions.push_back (sol);
-			if (estConsistant (solutions))
+			cout << "\tDomaine : " << d << endl;
+			//solutions.erase (&var->valeur);
+			//solutions.insert (&var->valeur, d);
+			int oldValue = solutions [var->valeur];
+			solutions [var->valeur] = d;
+			consistance = estConsistant (solutions);
+			if (consistance)
 				cout << "estConsistant" << endl;
+			else
+				solutions [var->valeur] = oldValue;
 			// Si A U {x <- v} est consistant
 				// solutions = backtrack (solutions, variablesEnCours);
 			

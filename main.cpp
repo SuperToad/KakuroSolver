@@ -17,8 +17,8 @@ int main (int argc, char * argv[])
 	csp->parse (argv[1]);
 	csp->show ();
 	
-	vector<Solution> solutions;
-	csp->backtrack (solutions, csp->getVariables ());
+	//vector<Solution> solutions;
+	csp->backtrack ();
 
 	return 0;
 }
