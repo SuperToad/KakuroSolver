@@ -1,3 +1,4 @@
+#include <stack>
 #include "csp.hpp"
 
 
@@ -8,6 +9,14 @@ Csp::Csp()
 Csp::~Csp()
 {
 	
+}
+
+bool Csp::estComplet (int* solutions)
+{
+	for (int i = 0; i < variables.size (); i++)
+		if (solutions[i] == -1)
+			return false;
+	return true;
 }
 
 bool Csp::estConsistant (int* solutions)
@@ -57,7 +66,8 @@ bool Csp::estConsistant (int* solutions)
 
 int* Csp::backtrack ()
 {
-	vector<Var> variablesEnCours = variables;
+	vector<Var> variablesTot = variables;
+	stack<Var> variablesEnCours;
 	
 	int solutions [variables.size ()];
 	// init solutions
@@ -71,10 +81,16 @@ int* Csp::backtrack ()
 	}
 	else
 	{*/
+
+	Var varInit = variablesTot.back (); // Choisir x dans V
+	variablesTot.pop_back ();
+
+	variablesEnCours.push(varInit);
 	while (!variablesEnCours.empty())
 	{
-		Var* var = &variablesEnCours.back (); // Choisir x dans V
-		variablesEnCours.pop_back ();
+		/*Var* var = &variablesEnCours.back (); // Choisir x dans V
+		variablesEnCours.pop_back ();*/
+		Var* var = &variablesEnCours.top ();
 		
 		cout << "\t\tVar : " << var->valeur << endl;
 		
@@ -89,7 +105,19 @@ int* Csp::backtrack ()
 			solutions [var->valeur] = d;
 			consistance = estConsistant (solutions);
 			if (consistance)
+			{
 				cout << "estConsistant" << endl;
+
+				// Retirer le haut de la pile
+				variablesEnCours.pop ();
+
+				if (estComplet (solutions) )
+				{
+					cout << "estComplet" << endl;
+					return solutions;
+				}
+
+			}
 			else
 				solutions [var->valeur] = oldValue;
 			// Si A U {x <- v} est consistant

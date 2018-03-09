@@ -58,6 +58,7 @@ class Csp {
 		void show ();
 		
 		bool estConsistant (int* solutions);
+		bool estComplet (int* solutions);
 		
 		int* backtrack ();
 		void forward_checking ();
