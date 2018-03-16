@@ -11,6 +11,7 @@ enum nature {DIFFERENCE,NAIRES};
 typedef struct
 {
 	int valeur;
+	int solution;
 	
 } Var;
 

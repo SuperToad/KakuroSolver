@@ -13,9 +13,18 @@ Csp::~Csp()
 
 bool Csp::estComplet (int* solutions)
 {
+	cout << "test1" << endl;
 	for (int i = 0; i < variables.size (); i++)
-		if (solutions[i] == -1)
+	{
+		cout << "i : " << variables.at(i).solution << endl;
+		//if (solutions[i] == 0)
+		if (variables.at(i).solution == 0)
+		{
+			cout << "test3" << endl;
 			return false;
+		}
+	}
+	cout << "test2" << endl;
 	return true;
 }
 
@@ -30,7 +39,8 @@ bool Csp::estConsistant (int* solutions)
 			// On verifie si la contrainte peut etre satisfaite :
 			// toutes les variables associées a la contrainte sont instanciés
 			
-			if (solutions[this->contraintes.at (i).portee.at (j)] == -1)
+			//if (solutions[this->contraintes.at (i).portee.at (j)] == 0)
+			if (variables.at(this->contraintes.at (i).portee.at (j)).solution == 0)
 				estVerifiable = false;
 		}
 		if (estVerifiable)
@@ -39,9 +49,9 @@ bool Csp::estConsistant (int* solutions)
 			
 			if (this->contraintes.at (i).nat == DIFFERENCE)
 			{
-				if (solutions[this->contraintes.at (i).portee.at (0)] == solutions[this->contraintes.at (i).portee.at (1)])
+				if (variables.at(this->contraintes.at (i).portee.at (0)).solution == variables.at(this->contraintes.at (i).portee.at (1)).solution)
 				{
-					cout << "Contrainte binaire de difference rejetee; valeur = " << solutions[this->contraintes.at (i).portee.at (0)] << endl;
+					cout << "Contrainte binaire de difference rejetee; valeur = " << variables.at(this->contraintes.at (i).portee.at (0)).solution << endl;
 					return false;
 				}
 			}
@@ -50,7 +60,7 @@ bool Csp::estConsistant (int* solutions)
 				int somme = 0;
 				for (int j = 0; j < this->contraintes.at (i).arite; j++)
 				{
-					somme += solutions[this->contraintes.at (i).portee.at (j)];
+					somme += variables.at(this->contraintes.at (i).portee.at (j)).solution;
 				}
 				cout << "Somme a atteindre = " << contraintes.at (i).valeur << "; resultat = " << somme << endl;
 				if (contraintes.at (i).valeur != somme)
@@ -58,70 +68,98 @@ bool Csp::estConsistant (int* solutions)
 			}
 			
 		}
-		else
-			cout << "Contrainte " << i << " non verifiable" << endl;
+		//else
+			//cout << "Contrainte " << i << " non verifiable" << endl;
 	}
 	return true;
 }
 
 int* Csp::backtrack ()
 {
-	vector<Var> variablesTot = variables;
-	stack<Var> variablesEnCours;
+	// init struct solutions
+	for (int i = 0; i < variables.size (); i++)
+		variables.at (i).solution = 0;
+	
+	vector<Var> variablesEnCours = variables;
+	stack<Var> pileVariables;
 	
 	int solutions [variables.size ()];
 	// init solutions
 	for (int i = 0; i < variables.size (); i++)
-		solutions[i] = -1;
+		solutions[i] = 0;
 	
-	/*if (variablesEnCours.empty())
+	
+	
+	/*if (pileVariables.empty())
 	{
 		// A est une solution
 		return solutions;
 	}
 	else
 	{*/
+	int idVar = 0;
 
-	Var varInit = variablesTot.back (); // Choisir x dans V
-	variablesTot.pop_back ();
-
-	variablesEnCours.push(varInit);
-	while (!variablesEnCours.empty())
+	Var varInit = variablesEnCours.back (); // Choisir x dans V
+	//variablesEnCours.pop_back ();
+	
+	// init pile
+	//for (int i = 0; i < variables.size (); i++)
+		//pileVariables.push(variables.at (i));
+	//pileVariables.push(varInit);
+	pileVariables.push(variablesEnCours.at (idVar++));
+	
+	while (!pileVariables.empty())
 	{
-		/*Var* var = &variablesEnCours.back (); // Choisir x dans V
-		variablesEnCours.pop_back ();*/
-		Var* var = &variablesEnCours.top ();
+		/*Var* var = &pileVariables.back (); // Choisir x dans V
+		pileVariables.pop_back ();*/
+		Var* var = &pileVariables.top ();
 		
 		cout << "\t\tVar : " << var->valeur << endl;
 		
 		bool consistance = false;
 		
-		for (int d = 1; ((d <= 9) && (!consistance)); d++)
+		for (int d = (var->solution + 1); ((d <= 9) && (!consistance)); d++)
 		{
 			cout << "\tDomaine : " << d << endl;
 			//solutions.erase (&var->valeur);
 			//solutions.insert (&var->valeur, d);
 			int oldValue = solutions [var->valeur];
-			solutions [var->valeur] = d;
+			//solutions [var->valeur] = d;
+			var->solution = d;
 			consistance = estConsistant (solutions);
 			if (consistance)
 			{
 				cout << "estConsistant" << endl;
-
-				// Retirer le haut de la pile
-				variablesEnCours.pop ();
-
+				
 				if (estComplet (solutions) )
 				{
 					cout << "estComplet" << endl;
 					return solutions;
 				}
+				
+				// Retirer la variable dans variablesEnCours
+				/*for (int i = 0; i <= variablesEnCours.size (); i++)
+					if (variablesEnCours.at (i).valeur == var->valeur)
+						variablesEnCours.erase (variablesEnCours.begin() + i);*/
+						
+				// Empiler la nouvelle variable
+				pileVariables.push(variablesEnCours.at (idVar++));
+
+				
 
 			}
 			else
-				solutions [var->valeur] = oldValue;
+			{
+				//solutions [var->valeur] = oldValue;
+				var->solution = oldValue;
+				
+				// Retirer le haut de la pile
+				pileVariables.pop ();
+				idVar = (--idVar < 0?0:idVar) ;
+				
+			}
 			// Si A U {x <- v} est consistant
-				// solutions = backtrack (solutions, variablesEnCours);
+				// solutions = backtrack (solutions, pileVariables);
 			
 		}
 	}
