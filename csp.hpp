@@ -12,7 +12,7 @@ typedef struct
 {
 	int valeur;
 	int solution;
-	
+	vector<int> domaine;
 } Var;
 
 typedef struct
@@ -58,10 +58,10 @@ class Csp {
 		inline vector<Var> getVariables () {return variables;};
 		void show ();
 		
-		bool estConsistant (int* solutions);
-		bool estComplet (int* solutions);
+		bool estConsistant ();
+		bool estComplet ();
 		
-		int* backtrack ();
+		vector<Var> backtrack ();
 		void forward_checking ();
 };
 

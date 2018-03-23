@@ -18,7 +18,13 @@ int main (int argc, char * argv[])
 	csp->show ();
 	
 	//vector<Solution> solutions;
-	csp->backtrack ();
+	vector<Var> solutions = csp->backtrack ();
+	
+	
+	// Affichage solution
+	for (int i = 0; i < solutions.size (); i++)
+		cout << "Solution pour " << solutions.at(i).valeur << " : " << solutions.at(i).solution << endl;
+	
 
 	return 0;
 }

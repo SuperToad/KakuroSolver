@@ -233,6 +233,12 @@ void Csp::Variable (int num)
   
   Var var;
   var.valeur = num;
+  var.solution = 0;
+  
+  for (int i = 1; i < 10; i++)
+  {
+    var.domaine.push_back (i);
+  }
   
   this->variables.push_back (var);
   printf ("Ajout Variable %d\n",num);
