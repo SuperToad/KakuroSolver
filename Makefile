@@ -1,4 +1,6 @@
-parser: parser.o csp.cpp main.cpp
+all: solver
+
+solver: parser.o csp.cpp main.cpp
 	g++ -g3 -o $@ $^
 
 %.o: %.cpp %.hpp

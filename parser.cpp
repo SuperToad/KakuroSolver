@@ -231,13 +231,13 @@ void Csp::Variable (int num)
 {
   printf ("Variable %d\n",num);
   
-  Var var;
-  var.valeur = num;
-  var.solution = 0;
+  Var* var = new Var;
+  var->valeur = num;
+  var->solution = 0;
   
   for (int i = 1; i < 10; i++)
   {
-    var.domaine.push_back (i);
+    var->domaine.push_back (i);
   }
   
   this->variables.push_back (var);
@@ -253,12 +253,12 @@ void Csp::Contrainte_Difference (int var1, int var2)
   
   
   
-  Contrainte contrainte;
-  contrainte.portee.push_back(var1);
-  contrainte.portee.push_back(var2);
-  contrainte.arite = 2;
-  contrainte.nat = DIFFERENCE;
-  contrainte.valeur = 0; // temp
+  Contrainte *contrainte = new Contrainte;
+  contrainte->ints.push_back(var1);
+  contrainte->ints.push_back(var2);
+  contrainte->arite = 2;
+  contrainte->nat = DIFFERENCE;
+  contrainte->valeur = 0; // temp
   
   this->contraintes.push_back (contrainte);
 }
@@ -274,13 +274,60 @@ void Csp::Contrainte_Somme (int portee [], int arite, int val)
     printf (" %d",portee[i]);
   printf (" et de valeur %d\n",val);  
   
-  Contrainte contrainte;
+  Contrainte *contrainte = new Contrainte;
   for (int i = 0; i < arite; i++)
-    contrainte.portee.push_back(portee[i]);
-  contrainte.arite = arite;
-  contrainte.nat = NAIRES;
-  contrainte.valeur = val;
+    contrainte->ints.push_back(portee[i]);
+  contrainte->arite = arite;
+  contrainte->nat = NAIRES;
+  contrainte->valeur = val;
   
   this->contraintes.push_back (contrainte);
   
+}
+
+void Csp::init_containtes ()
+{
+  for (int i = 0; i < contraintes.size(); i++)
+  {
+    cout << "lol" << endl;  
+    for (int j = 0; j < contraintes.at (i)->arite; j++)
+    {
+      cout << "lol" << endl;  
+      cout  << contraintes.at (i)->ints.at (j) << endl;
+      variables.at(contraintes.at (i)->ints.at (j))->contraintes.push_back ( contraintes.at (i));
+      contraintes.at (i)->portee.push_back ( variables.at(contraintes.at (i)->ints.at (j)));
+    }
+  }
+
+  for (int i = 0; i < this->variables.size(); i++)
+  {
+    cout << "Variable : " << i << " : ";
+    for (int j = 0; j < variables.at (i)->contraintes.size (); j++)
+    {
+      cout << variables.at (i)->contraintes.at (j)->arite << " ";
+    }
+    cout << endl;
+  }
+
+}
+
+bool domdeg (Var* i,Var* j) { return (i->heuristique > j->heuristique); }
+
+void Csp::calculer_heuristique ()
+{
+  for (int i = 0; i < this->variables.size(); i++)
+  {
+    variables.at (i)->heuristique = (variables.at (i)->domaine.size() / variables.at (i)->contraintes.size());
+  }
+
+  sort (variables.begin(), variables.end(), domdeg);
+}
+
+
+void Csp::initialisation (char * nom_fichier)
+{
+  parse (nom_fichier);
+  cout << "lol" << endl;  
+  init_containtes ();
+  //calculer_heuristique ();
 }

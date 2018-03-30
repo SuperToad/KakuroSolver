@@ -14,16 +14,16 @@ int main (int argc, char * argv[])
 
 	Csp *csp = new Csp ();
 
-	csp->parse (argv[1]);
+	csp->initialisation (argv[1]);
 	csp->show ();
 	
 	//vector<Solution> solutions;
-	vector<Var> solutions = csp->backtrack ();
+	vector<Var*> solutions = csp->backtrack ();
 	
 	
 	// Affichage solution
 	for (int i = 0; i < solutions.size (); i++)
-		cout << "Solution pour " << solutions.at(i).valeur << " : " << solutions.at(i).solution << endl;
+		cout << "Solution pour " << solutions.at(i)->valeur << " : " << solutions.at(i)->solution << endl;
 	
 
 	return 0;

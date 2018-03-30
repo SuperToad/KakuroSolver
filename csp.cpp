@@ -16,7 +16,7 @@ bool Csp::estComplet ()
 	for (int i = 0; i < variables.size (); i++)
 	{
 		//if (solutions[i] == 0)
-		if (variables.at(i).solution == 0)
+		if (variables.at(i)->solution == 0)
 		{
 			return false;
 		}
@@ -26,40 +26,41 @@ bool Csp::estComplet ()
 
 bool Csp::estConsistant ()
 {
-	for (int i = 0; i < this->contraintes.size (); i++)
+	for (int i = 0; i < currentVar->contraintes.size (); i++)
 	{
 		bool estVerifiable = true;
 		
-		for (int j = 0; ((j < this->contraintes.at (i).arite) && (estVerifiable)); j++)
+		for (int j = 0; ((j < currentVar->contraintes.at (i)->arite) && (estVerifiable)); j++)
 		{
 			// On verifie si la contrainte peut etre satisfaite :
 			// toutes les variables associées a la contrainte sont instanciés
 			
-			//if (solutions[this->contraintes.at (i).portee.at (j)] == 0)
-			if (variables.at(this->contraintes.at (i).portee.at (j)).solution == 0)
+			//if (solutions[this->contraintes.at (i).ints.at (j)] == 0)
+			//cout << "lol" << endl;
+			if ((currentVar->contraintes.at (i)->portee.at (j))->solution == 0)
 				estVerifiable = false;
 		}
 		if (estVerifiable)
 		{
 			//cout << "Contrainte " << i << " verifiable" << endl;
-			
-			if (this->contraintes.at (i).nat == DIFFERENCE)
+			//cout << "kek" << endl;
+			if (currentVar->contraintes.at (i)->nat == DIFFERENCE)
 			{
-				if (variables.at(this->contraintes.at (i).portee.at (0)).solution == variables.at(this->contraintes.at (i).portee.at (1)).solution)
+				if ( (currentVar->contraintes.at (i)->portee.at (0))->solution == (currentVar->contraintes.at (i)->portee.at (1))->solution)
 				{
-					//cout << "Contrainte binaire de difference rejetee; valeur = " << variables.at(this->contraintes.at (i).portee.at (0)).solution << endl;
+					//cout << "Contrainte binaire de difference rejetee; valeur = " << variables.at(this->contraintes.at (i).ints.at (0)).solution << endl;
 					return false;
 				}
 			}
 			else
 			{
 				int somme = 0;
-				for (int j = 0; j < this->contraintes.at (i).arite; j++)
+				for (int j = 0; j < currentVar->contraintes.at (i)->arite; j++)
 				{
-					somme += variables.at(this->contraintes.at (i).portee.at (j)).solution;
+					somme += currentVar->contraintes.at (i)->portee.at (j)->solution;
 				}
 				//cout << "Somme a atteindre = " << contraintes.at (i).valeur << "; resultat = " << somme << endl;
-				if (contraintes.at (i).valeur != somme)
+				if (currentVar->contraintes.at (i)->valeur != somme)
 					return false;
 			}
 			
@@ -70,7 +71,7 @@ bool Csp::estConsistant ()
 	return true;
 }
 
-vector<Var> Csp::backtrack ()
+vector<Var*> Csp::backtrack ()
 {
 	// Pile de recursion
 	stack<Var*> process;
@@ -78,11 +79,11 @@ vector<Var> Csp::backtrack ()
 	int nbNoeuds = 1;
 	int k = 0;
 	
-	process.push(&(variables.at (k)));
+	process.push(variables.at (k));
 	
 	while(!process.empty())
 	{
-		Var* currentVar = process.top(); // Choisir x dans V
+		currentVar = process.top(); // Choisir x dans V
 		
 		cout << "\t Var : " << currentVar->valeur << endl;
 		
@@ -100,7 +101,7 @@ vector<Var> Csp::backtrack ()
 				if(estComplet())
 					return variables;
 				// Empiler la nouvelle variable
-				process.push( &(variables.at (++k)) );
+				process.push( variables.at (++k));
 				++nbNoeuds;
 			}
 			
@@ -124,24 +125,35 @@ void Csp::show ()
 {
 	for (int i = 0; i < this->variables.size(); i++)
 	{
-		Var var = this->variables.at (i);
+		Var* var = this->variables.at (i);
 		
-		cout << "Variable : " << var.valeur << endl;
+		cout << "Variable : " << var->valeur << endl;
 		cout << "\tDomaine : " ;
-		for (int j = 0; j < this->variables.at (j).domaine.size(); j++)
-			cout << var.domaine.at (j) << " ";
+		for (int j = 0; j < var->domaine.size(); j++)
+			cout << var->domaine.at (j) << " ";
 		cout << endl;
 	}
 	
 	for (int i = 0; i < this->contraintes.size(); i++)
 	{
-		if (this->contraintes.at (i).nat == DIFFERENCE)
+		if (this->contraintes.at (i)->nat == DIFFERENCE)
 			cout << "Contrainte binaire de difference portant sur";
 		else
 			cout << "Contrainte n-aire de somme portant sur";
-		for (int j = 0; j < this->contraintes.at (i).arite; j++)
-			cout << " " << this->contraintes.at (i).portee.at (j);
-		cout << " et de valeur " <<  this->contraintes.at (i).valeur << endl;  
+		for (int j = 0; j < this->contraintes.at (i)->arite; j++)
+			cout << " " << this->contraintes.at (i)->ints.at (j);
+		cout << " et de valeur " <<  this->contraintes.at (i)->valeur << endl;  
+	}
+	cout << endl;  
+	for (int i = 0; i < this->contraintes.size(); i++)
+	{
+		if (this->contraintes.at (i)->nat == DIFFERENCE)
+			cout << "Contrainte binaire de difference portant sur";
+		else
+			cout << "Contrainte n-aire de somme portant sur";
+		for (int j = 0; j < this->contraintes.at (i)->arite; j++)
+			cout << " " << this->contraintes.at (i)->portee.at (j)->valeur;
+		cout << " et de valeur " <<  this->contraintes.at (i)->valeur << endl;  
 	}
 	
 }
