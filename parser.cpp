@@ -289,11 +289,11 @@ void Csp::init_containtes ()
 {
   for (int i = 0; i < contraintes.size(); i++)
   {
-    cout << "lol" << endl;  
+    //cout << "lol" << endl;  
     for (int j = 0; j < contraintes.at (i)->arite; j++)
     {
-      cout << "lol" << endl;  
-      cout  << contraintes.at (i)->ints.at (j) << endl;
+      //cout << "lol" << endl;  
+      //cout  << contraintes.at (i)->ints.at (j) << endl;
       variables.at(contraintes.at (i)->ints.at (j))->contraintes.push_back ( contraintes.at (i));
       contraintes.at (i)->portee.push_back ( variables.at(contraintes.at (i)->ints.at (j)));
     }
@@ -317,17 +317,21 @@ void Csp::calculer_heuristique ()
 {
   for (int i = 0; i < this->variables.size(); i++)
   {
-    variables.at (i)->heuristique = (variables.at (i)->domaine.size() / variables.at (i)->contraintes.size());
+    variables.at (i)->heuristique = (float)(variables.at (i)->domaine.size() / (float)variables.at (i)->contraintes.size());
   }
 
   sort (variables.begin(), variables.end(), domdeg);
+
+  for (int i = 0; i < this->variables.size(); i++)
+  {
+    cout << "Heuristique de " << variables.at (i)->valeur << " : " << variables.at (i)->heuristique << endl;
+  }
 }
 
 
 void Csp::initialisation (char * nom_fichier)
 {
-  parse (nom_fichier);
-  cout << "lol" << endl;  
+  parse (nom_fichier); 
   init_containtes ();
   //calculer_heuristique ();
 }

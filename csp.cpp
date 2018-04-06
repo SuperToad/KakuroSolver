@@ -85,14 +85,14 @@ vector<Var*> Csp::backtrack ()
 	{
 		currentVar = process.top(); // Choisir x dans V
 		
-		cout << "\t Var : " << currentVar->valeur << endl;
+		//cout << "\t Var : " << currentVar->valeur << endl;
 		
 		bool consistant = false;
 		
 		for(int i = currentVar->solution; i < currentVar->domaine.size() && !consistant; ++i)
 		{
 			currentVar->solution = currentVar->domaine.at (i);
-			cout << "\t\t Domaine : " << currentVar->solution << endl;
+			//cout << "\t\t Domaine : " << currentVar->solution << endl;
 			
 			consistant = estConsistant();
 			
@@ -114,11 +114,58 @@ vector<Var*> Csp::backtrack ()
 			currentVar->solution = 0;
 		}
 	}
+	return variables;
 }
 
-void Csp::forward_checking ()
+vector<Var*> Csp::forward_checking ()
 {
+	// Pile de recursion
+	stack<Var*> process;
 	
+	int nbNoeuds = 1;
+	int k = 0;
+	
+	process.push(variables.at (k));
+	
+	while(!process.empty())
+	{
+		currentVar = process.top(); // Choisir x dans V
+		
+		cout << "\t Var : " << currentVar->valeur << endl;
+		
+		bool consistant = false;
+		
+		for(int i = currentVar->solution; i < currentVar->domaine.size() && !consistant; ++i)
+		{
+			currentVar->solution = currentVar->domaine.at (i);
+			cout << "\t\t Domaine : " << currentVar->solution << endl;
+			
+			consistant = estConsistant();
+			
+			if(consistant)
+			{
+				if(estComplet())
+					return variables;
+				// Empiler la nouvelle variable
+				process.push( variables.at (++k));
+				++nbNoeuds;
+			}
+			else
+			{
+				cout << currentVar->domaine.at (i) << " retiré du domaine" << endl;
+				currentVar->domaine.erase (currentVar->domaine.begin () + i);
+			}
+			
+		}
+		if(!consistant)
+		{
+			// Retirer le haut de la pile
+			process.pop();
+			--k;
+			currentVar->solution = 0;
+		}
+	}
+	return variables;
 }
 
 void Csp::show ()
@@ -134,7 +181,7 @@ void Csp::show ()
 		cout << endl;
 	}
 	
-	for (int i = 0; i < this->contraintes.size(); i++)
+	/*for (int i = 0; i < this->contraintes.size(); i++)
 	{
 		if (this->contraintes.at (i)->nat == DIFFERENCE)
 			cout << "Contrainte binaire de difference portant sur";
@@ -144,7 +191,7 @@ void Csp::show ()
 			cout << " " << this->contraintes.at (i)->ints.at (j);
 		cout << " et de valeur " <<  this->contraintes.at (i)->valeur << endl;  
 	}
-	cout << endl;  
+	cout << endl; */ 
 	for (int i = 0; i < this->contraintes.size(); i++)
 	{
 		if (this->contraintes.at (i)->nat == DIFFERENCE)

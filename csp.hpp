@@ -74,7 +74,7 @@ class Csp {
 		bool estComplet ();
 		
 		vector<Var*> backtrack ();
-		void forward_checking ();
+		vector<Var*> forward_checking ();
 };
 
 #endif

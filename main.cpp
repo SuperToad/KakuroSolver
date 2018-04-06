@@ -15,10 +15,11 @@ int main (int argc, char * argv[])
 	Csp *csp = new Csp ();
 
 	csp->initialisation (argv[1]);
-	csp->show ();
+	//csp->show ();
 	
 	//vector<Solution> solutions;
-	vector<Var*> solutions = csp->backtrack ();
+	//vector<Var*> solutions = csp->backtrack ();
+	vector<Var*> solutions = csp->forward_checking ();
 	
 	
 	// Affichage solution
