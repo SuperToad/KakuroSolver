@@ -238,6 +238,7 @@ void Csp::Variable (int num)
   for (int i = 1; i < 10; i++)
   {
     var->domaine.push_back (i);
+    var->domaineComplet.push_back (i);
   }
   
   this->variables.push_back (var);
@@ -301,12 +302,7 @@ void Csp::init_containtes ()
 
   for (int i = 0; i < this->variables.size(); i++)
   {
-    cout << "Variable : " << i << " : ";
-    for (int j = 0; j < variables.at (i)->contraintes.size (); j++)
-    {
-      cout << variables.at (i)->contraintes.at (j)->arite << " ";
-    }
-    cout << endl;
+    cout << "Variable : " << i << " : " << variables.at (i)->contraintes.size() << endl;
   }
 
 }

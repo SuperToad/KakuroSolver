@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <stack>
 #include <algorithm>    // std::sort
 
 using namespace std;
@@ -31,6 +32,7 @@ struct Var
 	int solution;
 	float heuristique;
 	vector<int> domaine;
+	vector<int> domaineComplet;
 	vector<Contrainte*> contraintes;
 };
 
@@ -41,13 +43,22 @@ typedef struct
 	
 } Solution;
 
+typedef struct
+{
+	Var* variable;
+	int domaine;
+	
+} ElementRetire;
+
 class Csp {
 	private:
 		vector<Var*> variables;
 		vector<Contrainte*> contraintes;
 
 		Var* currentVar;
-		
+		stack<ElementRetire> elementsRetires;
+		vector<int> nbElementRetires;
+		int tour;
 		
 	public:
 		Csp();
@@ -71,6 +82,7 @@ class Csp {
 		void show ();
 		
 		bool estConsistant ();
+		bool estConsistantFC ();
 		bool estComplet ();
 		
 		vector<Var*> backtrack ();
