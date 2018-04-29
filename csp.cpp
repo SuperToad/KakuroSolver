@@ -128,7 +128,7 @@ bool Csp::estConsistantFC ()
 							element.variable = varEnnemie;
 							element.domaine = varEnnemie->domaine.at (k);
 							elementsRetires.push(element);
-							nbElementRetires.at (tour)++;
+							(nbElementRetires.at (tour))++;
 							cout << varEnnemie->domaine.at (k) << " retiré(diff) du domaine de " << varEnnemie->valeur << endl;
 							varEnnemie->domaine.erase (varEnnemie->domaine.begin () + k);
 							k--;
@@ -139,22 +139,51 @@ bool Csp::estConsistantFC ()
 		}
 		else // Contrainte de somme
 		{
-			for (int j = 0; j < contrainte->arite; j++)
+			int somme = 0;
+			int varNonInnits = 0;
+			Var* varTestee = NULL;
+			for (int j = 0; (j < contrainte->arite) && (varNonInnits < 2); j++)
 			{
-				if (contrainte->portee.at (j) != currentVar)
+				Var* var = contrainte->portee.at (j);
+				if (var->solution == 0)
 				{
-					Var* varEnnemie = contrainte->portee.at (j);
-					for (int k = 0; k < varEnnemie->domaine.size(); k++)
+					varNonInnits++;
+					varTestee = var;
+				}
+				else
+				{
+					somme += var->solution;
+				}
+				/*for (int k = 0; k < varEnnemie->domaine.size(); k++)
+				{
+					if ((varEnnemie->domaine.at (k) + currentVar->solution) > contrainte->valeur)
 					{
-						if ((varEnnemie->domaine.at (k) + currentVar->solution) > contrainte->valeur)
+						ElementRetire element;
+						element.variable = varEnnemie;
+						element.domaine = varEnnemie->domaine.at (k);
+						elementsRetires.push(element);
+						nbElementRetires.at (tour)++;
+						cout << varEnnemie->domaine.at (k) << " retiré(somme) du domaine de " << varEnnemie->valeur << endl;
+						varEnnemie->domaine.erase (varEnnemie->domaine.begin () + k);
+						k--;
+					}
+				}*/
+			}
+			if (varNonInnits == 1)
+			{
+				if (varTestee != NULL)
+				{
+					for (int k = 0; k < varTestee->domaine.size(); k++)
+					{
+						if ((varTestee->domaine.at (k) + somme) != contrainte->valeur)
 						{
 							ElementRetire element;
-							element.variable = varEnnemie;
-							element.domaine = varEnnemie->domaine.at (k);
+							element.variable = varTestee;
+							element.domaine = varTestee->domaine.at (k);
 							elementsRetires.push(element);
-							nbElementRetires.at (tour)++;
-							cout << varEnnemie->domaine.at (k) << " retiré(somme) du domaine de " << varEnnemie->valeur << endl;
-							varEnnemie->domaine.erase (varEnnemie->domaine.begin () + k);
+							(nbElementRetires.at (tour))++;
+							cout << varTestee->domaine.at (k) << " retiré(somme) du domaine de " << varTestee->valeur << endl;
+							varTestee->domaine.erase (varTestee->domaine.begin () + k);
 							k--;
 						}
 					}
@@ -180,70 +209,80 @@ vector<Var*> Csp::forward_checking ()
 	while(!process.empty())
 	{
 		currentVar = process.top(); // Choisir x dans V
-		
+		cout << "\t Tour : " << tour << endl;
+
 		if (currentVar->domaine.size() == 0)
 		{
 			cout << "\t Var : " << currentVar->valeur << " : DOMAINE VIDE" << endl;
+			tour--;
+			tour--;
 			int nbElementRetiresTour = nbElementRetires.at (tour);
 			for (int i = 0; i < nbElementRetiresTour; i++)
 			{
 				ElementRetire element = elementsRetires.top();
 				elementsRetires.pop();
 				element.variable->domaine.push_back(element.domaine);
+				cout << element.domaine << " rajouté à la variable " << element.variable->valeur << endl;
 			}
 			nbElementRetires.at (tour) = 0;
-			tour--;
-		}
-		
-		cout << "\t Var : " << currentVar->valeur << endl;
-		nbElementRetires.push_back(0);
-		
-		bool consistant = false;
-		
-		for (int i = currentVar->solution; i < currentVar->domaine.size() && !consistant; i)
-		{
-			currentVar->solution = currentVar->domaine.at (i);
-			cout << "\t\t Domaine : " << currentVar->solution << endl;
-			
-			consistant = estConsistantFC();
-			
-			if(consistant)
-			{
-				if(estComplet())
-					return variables;
-				// Empiler la nouvelle variable
-				process.push( variables.at (++k));
-				++nbNoeuds;
-				++tour;
-			}
-			/*else
-			{
-				ElementRetire element;
-				element.variable = currentVar;
-				element.domaine = currentVar->domaine.at (i);
-				elementsRetires.push(element);
-				nbRetiresEtape++;
-				cout << currentVar->domaine.at (i) << " retiré du domaine" << endl;
-				currentVar->domaine.erase (currentVar->domaine.begin () + i);
-			}*/
-			
-		}
-		if(!consistant)
-		{
-			// Retirer le haut de la pile
+			//tour--;
 			process.pop();
 			--k;
 			currentVar->solution = 0;
-			--tour;
-			/*for (int i = 0; i < nbElementRetires; i++)
-			{
-				ElementRetire element = elementsRetires.top();
-				elementsRetires.pop();
-				element.variable->domaine.push_back(element.domaine);
-			}
-			nbRetiresEtape = 0;*/
-			//currentVar->domaine = currentVar->domaineComplet;
 		}
+		else
+		{
+			cout << "\t Var : " << currentVar->valeur << endl;
+			nbElementRetires.push_back(0);
+			
+			bool consistant = false;
+			
+			for (int i = currentVar->solution; i < currentVar->domaine.size() && !consistant; i)
+			{
+				currentVar->solution = currentVar->domaine.at (i);
+				cout << "\t\t Domaine : " << currentVar->solution << endl;
+				
+				consistant = estConsistantFC();
+				
+				if(consistant)
+				{
+					if(estComplet())
+						return variables;
+					// Empiler la nouvelle variable
+					process.push( variables.at (++k));
+					++nbNoeuds;
+					++tour;
+				}
+				/*else
+				{
+					ElementRetire element;
+					element.variable = currentVar;
+					element.domaine = currentVar->domaine.at (i);
+					elementsRetires.push(element);
+					nbRetiresEtape++;
+					cout << currentVar->domaine.at (i) << " retiré du domaine" << endl;
+					currentVar->domaine.erase (currentVar->domaine.begin () + i);
+				}*/
+				
+			}
+			if(!consistant)
+			{
+				// Retirer le haut de la pile
+				process.pop();
+				--k;
+				currentVar->solution = 0;
+				//--tour;
+				/*for (int i = 0; i < nbElementRetires; i++)
+				{
+					ElementRetire element = elementsRetires.top();
+					elementsRetires.pop();
+					element.variable->domaine.push_back(element.domaine);
+				}
+				nbRetiresEtape = 0;*/
+				//currentVar->domaine = currentVar->domaineComplet;
+			}
+		}
+		
 	}
 	return variables;
 }
