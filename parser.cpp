@@ -307,7 +307,7 @@ void Csp::init_containtes ()
 
 }
 
-bool domdeg (Var* i,Var* j) { return (i->heuristique > j->heuristique); }
+bool domdeg (Var* i,Var* j) { return (i->heuristique < j->heuristique); }
 
 void Csp::calculer_heuristique ()
 {
@@ -329,5 +329,5 @@ void Csp::initialisation (char * nom_fichier)
 {
   parse (nom_fichier); 
   init_containtes ();
-  //calculer_heuristique ();
+  calculer_heuristique ();
 }

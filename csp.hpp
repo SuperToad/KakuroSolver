@@ -59,6 +59,7 @@ class Csp {
 		stack<ElementRetire> elementsRetires;
 		vector<int> nbElementRetires;
 		int tour;
+		stack<Var*> process;
 		
 	public:
 		Csp();
@@ -84,6 +85,8 @@ class Csp {
 		bool estConsistant ();
 		bool estConsistantFC ();
 		bool estComplet ();
+
+		bool domaineVide (Var* var);
 		
 		vector<Var*> backtrack ();
 		vector<Var*> forward_checking ();

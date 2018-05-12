@@ -108,8 +108,33 @@ vector<Var*> Csp::backtrack ()
 	return variables;
 }
 
+bool Csp::domaineVide (Var* var)
+{
+	if (var->domaine.size() == 0)
+	{
+		cout << "\t Var : " << var->valeur << " : DOMAINE VIDE 2" << endl;
+		//tour--;
+		int nbElementRetiresTour = nbElementRetires.at (tour);
+		for (int i = 0; i < nbElementRetiresTour; i++)
+		{
+			ElementRetire element = elementsRetires.top();
+			elementsRetires.pop();
+			element.variable->domaine.push_back(element.domaine);
+			cout << element.domaine << " rajouté à la variable " << element.variable->valeur << endl;
+		}
+		nbElementRetires.at (tour) = 0;
+		tour--;
+		process.pop();
+		//--k;
+		currentVar->solution = 0;
+		return true;
+	}
+	return false;
+}
+
 bool Csp::estConsistantFC ()
 {
+	bool emptyDomain = false;
 	for (int i = 0; i < currentVar->contraintes.size (); i++)
 	{
 		Contrainte* contrainte = currentVar->contraintes.at (i);
@@ -132,6 +157,8 @@ bool Csp::estConsistantFC ()
 							cout << varEnnemie->domaine.at (k) << " retiré(diff) du domaine de " << varEnnemie->valeur << endl;
 							varEnnemie->domaine.erase (varEnnemie->domaine.begin () + k);
 							k--;
+							if (domaineVide (varEnnemie))
+								return true;
 						}
 					}
 				}
@@ -154,20 +181,6 @@ bool Csp::estConsistantFC ()
 				{
 					somme += var->solution;
 				}
-				/*for (int k = 0; k < varEnnemie->domaine.size(); k++)
-				{
-					if ((varEnnemie->domaine.at (k) + currentVar->solution) > contrainte->valeur)
-					{
-						ElementRetire element;
-						element.variable = varEnnemie;
-						element.domaine = varEnnemie->domaine.at (k);
-						elementsRetires.push(element);
-						nbElementRetires.at (tour)++;
-						cout << varEnnemie->domaine.at (k) << " retiré(somme) du domaine de " << varEnnemie->valeur << endl;
-						varEnnemie->domaine.erase (varEnnemie->domaine.begin () + k);
-						k--;
-					}
-				}*/
 			}
 			if (varNonInnits == 1)
 			{
@@ -185,19 +198,21 @@ bool Csp::estConsistantFC ()
 							cout << varTestee->domaine.at (k) << " retiré(somme) du domaine de " << varTestee->valeur << endl;
 							varTestee->domaine.erase (varTestee->domaine.begin () + k);
 							k--;
+							if (domaineVide (varTestee))
+								return true;
 						}
 					}
 				}
 			}
 		}
 	}
-	return true;
+	return emptyDomain;
 }
 
 vector<Var*> Csp::forward_checking ()
 {
 	// Pile de recursion
-	stack<Var*> process;
+	//stack<Var*> process;
 	
 	int nbNoeuds = 1;
 	int k = 0;
@@ -205,13 +220,14 @@ vector<Var*> Csp::forward_checking ()
 	tour = 0;
 	
 	process.push(variables.at (k));
+			nbElementRetires.push_back (0);
 	
 	while(!process.empty())
 	{
 		currentVar = process.top(); // Choisir x dans V
 		cout << "\t Tour : " << tour << endl;
 
-		if (currentVar->domaine.size() == 0)
+		if (currentVar->domaine.size() == 0) // Unutilisé normalement
 		{
 			cout << "\t Var : " << currentVar->valeur << " : DOMAINE VIDE" << endl;
 			tour--;
@@ -233,25 +249,27 @@ vector<Var*> Csp::forward_checking ()
 		else
 		{
 			cout << "\t Var : " << currentVar->valeur << endl;
-			nbElementRetires.push_back(0);
 			
-			bool consistant = false;
+			bool domaineVide = false;
+			nbElementRetires.push_back (0);
 			
-			for (int i = currentVar->solution; i < currentVar->domaine.size() && !consistant; i)
+			for (int i = currentVar->solution; (i < currentVar->domaine.size()) && (!domaineVide); i++)
 			{
 				currentVar->solution = currentVar->domaine.at (i);
 				cout << "\t\t Domaine : " << currentVar->solution << endl;
-				
-				consistant = estConsistantFC();
-				
-				if(consistant)
+				cout << "kek" << endl;
+				domaineVide = estConsistantFC();
+				cout << "kek" << endl;
+				if(!domaineVide)
 				{
 					if(estComplet())
 						return variables;
 					// Empiler la nouvelle variable
 					process.push( variables.at (++k));
+					cout << "trolol" << endl;
 					++nbNoeuds;
 					++tour;
+					nbElementRetires.push_back (0);
 				}
 				/*else
 				{
@@ -263,9 +281,24 @@ vector<Var*> Csp::forward_checking ()
 					cout << currentVar->domaine.at (i) << " retiré du domaine" << endl;
 					currentVar->domaine.erase (currentVar->domaine.begin () + i);
 				}*/
-				
+				else
+				{
+					--k;
+					cout << "mdr" << endl;
+					i = 9999;
+				}
 			}
-			if(!consistant)
+			/*if(!domaineVide)
+				{
+					if(estComplet())
+						return variables;
+					// Empiler la nouvelle variable
+					process.push( variables.at (++k));
+					++nbNoeuds;
+					++tour;
+					nbElementRetires.push_back (0);
+				}
+			if(!domaineVide)
 			{
 				// Retirer le haut de la pile
 				process.pop();
@@ -280,7 +313,7 @@ vector<Var*> Csp::forward_checking ()
 				}
 				nbRetiresEtape = 0;*/
 				//currentVar->domaine = currentVar->domaineComplet;
-			}
+			//}
 		}
 		
 	}
