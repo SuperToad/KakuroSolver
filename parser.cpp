@@ -329,5 +329,5 @@ void Csp::initialisation (char * nom_fichier)
 {
   parse (nom_fichier); 
   init_containtes ();
-  calculer_heuristique ();
+  //calculer_heuristique ();
 }

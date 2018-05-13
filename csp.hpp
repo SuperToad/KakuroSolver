@@ -83,7 +83,7 @@ class Csp {
 		void show ();
 		
 		bool estConsistant ();
-		bool estConsistantFC ();
+		bool verificationDomaine ();
 		bool estComplet ();
 
 		bool domaineVide (Var* var);
