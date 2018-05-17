@@ -108,6 +108,9 @@ vector<Var*> Csp::backtrack ()
 	return variables;
 }
 
+
+bool myfunction (int i,int j) { return (i<j); }
+
 bool Csp::domaineVide (Var* var)
 {
 	if (var->domaine.size() == 0)
@@ -120,6 +123,7 @@ bool Csp::domaineVide (Var* var)
 			ElementRetire element = elementsRetires.top();
 			elementsRetires.pop();
 			element.variable->domaine.push_back(element.domaine);
+				sort (element.variable->domaine.begin(), element.variable->domaine.end(), myfunction);
 			//cout << element.domaine << " rajouté à la variable " << element.variable->valeur << endl;
 		}
 		nbElementRetires.at (tour) = 0;
@@ -207,6 +211,7 @@ bool Csp::verificationDomaine ()
 	return emptyDomain;
 }
 
+
 vector<Var*> Csp::forward_checking ()
 {
 	// Pile de recursion
@@ -240,8 +245,8 @@ vector<Var*> Csp::forward_checking ()
 				if (currentVar->solution == currentVar->domaine.at (i))
 					begin = i + 1;
 		}
-		//cout << "solution : " << currentVar->solution << endl;
-		//cout << "begin : " << begin << endl;
+		cout << "solution : " << currentVar->solution << endl;
+		cout << "begin : " << begin << endl;
 		for(int i = begin; i < currentVar->domaine.size() && domaineVide; ++i)
 		{
 			currentVar->solution = currentVar->domaine.at (i);
@@ -259,9 +264,23 @@ vector<Var*> Csp::forward_checking ()
 				// Empiler la nouvelle variable
 				process.push( variables.at (++k));
 				++nbNoeuds;
-					++tour;
-					nbElementRetires.push_back (0);
+				++tour;
+				nbElementRetires.push_back (0);
 			}
+			/*else
+			{
+				// On reinsere les valeurs a remettre
+				int nbElementRetiresTour = nbElementRetires.at (tour);
+				for (int i = 0; i < nbElementRetiresTour; i++)
+				{
+					ElementRetire element = elementsRetires.top();
+					elementsRetires.pop();
+					element.variable->domaine.push_back(element.domaine);
+					//cout << element.domaine << " rajouté à la variable " << element.variable->valeur << endl;
+				}
+				nbElementRetires.at (tour) = 0;
+				//currentVar->solution = 0;
+			}*/
 			
 		}
 		if(domaineVide)
@@ -277,8 +296,10 @@ vector<Var*> Csp::forward_checking ()
 				ElementRetire element = elementsRetires.top();
 				elementsRetires.pop();
 				element.variable->domaine.push_back(element.domaine);
+				sort (element.variable->domaine.begin(), element.variable->domaine.end(), myfunction);
 				//cout << element.domaine << " rajouté à la variable " << element.variable->valeur << endl;
 			}
+
 			nbElementRetires.at (tour) = 0;
 			currentVar->solution = 0;
 		}
