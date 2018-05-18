@@ -64,7 +64,7 @@ void Csp::show ()
 	
 }
 
-bool domdeg (Var* i,Var* j) { return (i->heuristique < j->heuristique); }
+bool domdeg (Var* i,Var* j) { return (i->heuristique > j->heuristique); }
 
 void Csp::calculer_heuristique ()
 {

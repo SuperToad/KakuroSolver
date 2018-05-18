@@ -307,23 +307,6 @@ void Csp::init_containtes ()
 
 }
 
-bool domdeg (Var* i,Var* j) { return (i->heuristique < j->heuristique); }
-
-void Csp::calculer_heuristique ()
-{
-  for (int i = 0; i < this->variables.size(); i++)
-  {
-    variables.at (i)->heuristique = (float)(variables.at (i)->domaine.size() / (float)variables.at (i)->contraintes.size());
-  }
-
-  sort (variables.begin(), variables.end(), domdeg);
-
-  for (int i = 0; i < this->variables.size(); i++)
-  {
-    cout << "Heuristique de " << variables.at (i)->valeur << " : " << variables.at (i)->heuristique << endl;
-  }
-}
-
 
 void Csp::initialisation (char * nom_fichier)
 {
