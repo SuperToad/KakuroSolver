@@ -57,12 +57,6 @@ int main (int argc, char * argv[])
 			cout << "Solution pour " << solutionsFC.at(i)->valeur << " : " << solutionsFC.at(i)->solution << endl;
 	}
 	
-	//
-	//vector<Var*> solutions = csp->forward_checking ();
-	
-	
-	
-	
 
 	return 0;
 }

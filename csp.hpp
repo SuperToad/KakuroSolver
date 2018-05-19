@@ -20,7 +20,7 @@ typedef struct
 	int arite; // Nombre de variables soumises `a la contrainte
 	nature nat; // 0 : binaire de difference 1 : n-aires
 	int valeur; 
-	/* Si nat == DIFFERENCE, valeur = ? 
+	/* Si nat == DIFFERENCE, valeur = 0
 	 * Si nat == NAIRES, valeur = somme a atteindre
 	 */
 	
@@ -32,16 +32,8 @@ struct Var
 	int solution;
 	float heuristique;
 	vector<int> domaine;
-	vector<int> domaineComplet;
 	vector<Contrainte*> contraintes;
 };
-
-typedef struct
-{
-	Var variable;
-	int valeur;
-	
-} Solution;
 
 typedef struct
 {
@@ -59,7 +51,11 @@ class Csp {
 		stack<ElementRetire> elementsRetires;
 		vector<int> nbElementRetires;
 		int tour;
+
+		// Pile de recursion
 		stack<Var*> process;
+
+		int nbContraintesTestees;
 		
 	public:
 		Csp();

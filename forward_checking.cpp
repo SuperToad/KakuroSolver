@@ -1,7 +1,17 @@
 #include "csp.hpp"
 
-bool myfunction (int i,int j) { return (i<j); }
+/*
+	sortInt
+	Fonction utilisée pour le tri d'entiers
+*/
+bool sortInt (int i,int j) { return (i<j); }
 
+/*
+	domaineVide
+	Vérifie si le domaine de var est vide
+	Si c'est le cas, les valeurs de domaine sont restituées aux variables et retourne vrai
+	Retourne faux si le domaine n'est pas vide
+*/
 bool Csp::domaineVide (Var* var)
 {
 	if (var->domaine.size() == 0)
@@ -14,7 +24,7 @@ bool Csp::domaineVide (Var* var)
 			ElementRetire element = elementsRetires.top();
 			elementsRetires.pop();
 			element.variable->domaine.push_back(element.domaine);
-				sort (element.variable->domaine.begin(), element.variable->domaine.end(), myfunction);
+				sort (element.variable->domaine.begin(), element.variable->domaine.end(), sortInt);
 			//cout << element.domaine << " rajouté à la variable " << element.variable->valeur << endl;
 		}
 		nbElementRetires.at (tour) = 0;
@@ -24,6 +34,12 @@ bool Csp::domaineVide (Var* var)
 	return false;
 }
 
+/*
+	verificationDomaine
+	Vérifie si des valeurs de domaine doivent etre retirées.
+	Seules les contraintes associées à la variable courante sont testées.
+	Retourne vrai si ces retraits entrainent un domaine vide, faux sinon.
+*/
 bool Csp::verificationDomaine ()
 {
 	bool emptyDomain = false;
@@ -39,6 +55,7 @@ bool Csp::verificationDomaine ()
 					Var* varEnnemie = contrainte->portee.at (j);
 					for (int k = 0; k < varEnnemie->domaine.size(); k++)
 					{
+						nbContraintesTestees++;
 						if (varEnnemie->domaine.at (k) == currentVar->solution)
 						{
 							ElementRetire element;
@@ -81,6 +98,7 @@ bool Csp::verificationDomaine ()
 				{
 					for (int k = 0; k < varTestee->domaine.size(); k++)
 					{
+						nbContraintesTestees++;
 						if ((varTestee->domaine.at (k) + somme) != contrainte->valeur)
 						{
 							ElementRetire element;
@@ -102,12 +120,16 @@ bool Csp::verificationDomaine ()
 	return emptyDomain;
 }
 
-
+/*
+	forward_checking
+	Retourne un vecteur de variables contenant la solution du problème.
+*/
 vector<Var*> Csp::forward_checking ()
 {
 	
 	int nbNoeuds = 1;
 	int k = 0;
+	nbContraintesTestees = 0;
 	
 	tour = 0;
 	
@@ -147,6 +169,8 @@ vector<Var*> Csp::forward_checking ()
 			{
 				if(estComplet())
 				{
+					cout << "Nombre de noeuds : " << nbNoeuds << endl;
+					cout << "Nombre de contraintes testees : " << nbContraintesTestees << endl;
 					return variables;
 				}
 				// Empiler la nouvelle variable
@@ -170,7 +194,7 @@ vector<Var*> Csp::forward_checking ()
 				ElementRetire element = elementsRetires.top();
 				elementsRetires.pop();
 				element.variable->domaine.push_back(element.domaine);
-				sort (element.variable->domaine.begin(), element.variable->domaine.end(), myfunction);
+				sort (element.variable->domaine.begin(), element.variable->domaine.end(), sortInt);
 				//cout << element.domaine << " rajouté à la variable " << element.variable->valeur << endl;
 			}
 

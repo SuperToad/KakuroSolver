@@ -1,5 +1,11 @@
 #include "csp.hpp"
 
+/*
+	estConsistant
+	Retourne vrai si aucune contrainte est violée.
+	Seules les contraintes associées à la variable courante sont testées.
+	On vérifie aussi que toutes les variables de la portée de la contrainte sont instanciées avant d'éffectuer le test.
+*/
 bool Csp::estConsistant ()
 {
 	for (int i = 0; i < currentVar->contraintes.size (); i++)
@@ -9,12 +15,13 @@ bool Csp::estConsistant ()
 		for (int j = 0; ((j < currentVar->contraintes.at (i)->arite) && (estVerifiable)); j++)
 		{
 			// On verifie si la contrainte peut etre satisfaite :
-			// toutes les variables associées a la contrainte sont instanciés
+			// toutes les variables associées a la contrainte sont instanciées
 			if ((currentVar->contraintes.at (i)->portee.at (j))->solution == 0)
 				estVerifiable = false;
 		}
 		if (estVerifiable)
 		{
+			nbContraintesTestees++;
 			if (currentVar->contraintes.at (i)->nat == DIFFERENCE)
 			{
 				if ( (currentVar->contraintes.at (i)->portee.at (0))->solution == (currentVar->contraintes.at (i)->portee.at (1))->solution)
@@ -39,14 +46,18 @@ bool Csp::estConsistant ()
 	return true;
 }
 
+/*
+	backtrack
+	Retourne un vecteur de variables contenant la solution du problème.
+*/
 vector<Var*> Csp::backtrack ()
 {
-	// Pile de recursion
-	stack<Var*> process;
 	
 	int nbNoeuds = 1;
 	int k = 0;
 	
+	nbContraintesTestees = 0;
+
 	process.push(variables.at (k));
 	
 	while(!process.empty())
@@ -67,7 +78,11 @@ vector<Var*> Csp::backtrack ()
 			if(consistant)
 			{
 				if(estComplet())
+				{
+					cout << "Nombre de noeuds : " << nbNoeuds << endl;
+					cout << "Nombre de contraintes testees : " << nbContraintesTestees << endl;
 					return variables;
+				}
 				// Empiler la nouvelle variable
 				process.push( variables.at (++k));
 				++nbNoeuds;

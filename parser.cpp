@@ -238,7 +238,6 @@ void Csp::Variable (int num)
   for (int i = 1; i < 10; i++)
   {
     var->domaine.push_back (i);
-    var->domaineComplet.push_back (i);
   }
   
   this->variables.push_back (var);
@@ -290,20 +289,18 @@ void Csp::init_containtes ()
 {
   for (int i = 0; i < contraintes.size(); i++)
   {
-    //cout << "lol" << endl;  
     for (int j = 0; j < contraintes.at (i)->arite; j++)
     {
-      //cout << "lol" << endl;  
       //cout  << contraintes.at (i)->ints.at (j) << endl;
       variables.at(contraintes.at (i)->ints.at (j))->contraintes.push_back ( contraintes.at (i));
       contraintes.at (i)->portee.push_back ( variables.at(contraintes.at (i)->ints.at (j)));
     }
   }
 
-  for (int i = 0; i < this->variables.size(); i++)
+  /*for (int i = 0; i < this->variables.size(); i++)
   {
     cout << "Variable : " << i << " : " << variables.at (i)->contraintes.size() << endl;
-  }
+  }*/
 
 }
 
@@ -312,5 +309,4 @@ void Csp::initialisation (char * nom_fichier)
 {
   parse (nom_fichier); 
   init_containtes ();
-  //calculer_heuristique ();
 }

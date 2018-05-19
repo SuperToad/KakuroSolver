@@ -11,6 +11,11 @@ Csp::~Csp()
 	
 }
 
+/*
+	estComplet
+	Retourne vrai si toutes les variables de l'instance CSP ont une valeur
+	Retourne faux sinon
+*/
 bool Csp::estComplet ()
 {
 	for (int i = 0; i < variables.size (); i++)
@@ -26,7 +31,11 @@ bool Csp::estComplet ()
 
 
 
-
+/*
+	show
+	Affiche les variables et leur domaine, 
+	ainsi que les contrantes et les variables de leur portée
+*/
 void Csp::show ()
 {
 	for (int i = 0; i < this->variables.size(); i++)
@@ -39,18 +48,6 @@ void Csp::show ()
 			cout << var->domaine.at (j) << " ";
 		cout << endl;
 	}
-	
-	/*for (int i = 0; i < this->contraintes.size(); i++)
-	{
-		if (this->contraintes.at (i)->nat == DIFFERENCE)
-			cout << "Contrainte binaire de difference portant sur";
-		else
-			cout << "Contrainte n-aire de somme portant sur";
-		for (int j = 0; j < this->contraintes.at (i)->arite; j++)
-			cout << " " << this->contraintes.at (i)->ints.at (j);
-		cout << " et de valeur " <<  this->contraintes.at (i)->valeur << endl;  
-	}
-	cout << endl; */ 
 	for (int i = 0; i < this->contraintes.size(); i++)
 	{
 		if (this->contraintes.at (i)->nat == DIFFERENCE)
@@ -64,8 +61,19 @@ void Csp::show ()
 	
 }
 
+
+/*
+	domdeg
+	Fonction de comparaison entre les valeur d'heuristique de deux variables.
+	Utilisée pour trier les variables selon leur valeur d'heuristique
+*/
 bool domdeg (Var* i,Var* j) { return (i->heuristique > j->heuristique); }
 
+/*
+	calculer_heuristique
+	Calcule la valeur d'heuristique de chaque variable selon dom/deg
+	Trie ensuite les variable pour leur utilisation dans les fonction de résolution
+*/
 void Csp::calculer_heuristique ()
 {
   for (int i = 0; i < this->variables.size(); i++)
